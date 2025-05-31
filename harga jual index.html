@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Harga Jual Otomatis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 800px;
+        }
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="container bg-white shadow-lg rounded-lg p-8 md:p-10 w-full">
+        <h1 class="text-3xl font-bold text-center text-gray-800 mb-8">Kalkulator Harga Jual Produk Digital</h1>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-blue-50 p-6 rounded-lg shadow-sm">
+                <h2 class="text-xl font-semibold text-blue-700 mb-4">1. Biaya Pokok (COGS)</h2>
+                <div class="mb-4">
+                    <label for="costOfGoods" class="block text-gray-700 text-sm font-medium mb-2">Harga Beli / Biaya Produksi Produk (Rp)</label>
+                    <input type="number" id="costOfGoods" value="0" min="0" class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-150 ease-in-out">
+                </div>
+            </div>
+
+            <div class="bg-green-50 p-6 rounded-lg shadow-sm">
+                <h2 class="text-xl font-semibold text-green-700 mb-4">2. Biaya Operasional</h2>
+                <div class="mb-4">
+                    <label for="adCost" class="block text-gray-700 text-sm font-medium mb-2">Biaya Iklan (Rp)</label>
+                    <input type="number" id="adCost" value="0" min="0" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
+                </div>
+                <div class="mb-4">
+                    <label for="platformFee" class="block text-gray-700 text-sm font-medium mb-2">Biaya Platform / Komisi Marketplace (%)</label>
+                    <input type="number" id="platformFee" value="0" min="0" max="100" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
+                </div>
+                <div class="mb-4">
+                    <label for="packagingCost" class="block text-gray-700 text-sm font-medium mb-2">Biaya Pengemasan (Rp)</label>
+                    <input type="number" id="packagingCost" value="0" min="0" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
+                </div>
+                <div class="mb-4">
+                    <label for="shippingCost" class="block text-gray-700 text-sm font-medium mb-2">Biaya Pengiriman (Jika Ditanggung Penjual) (Rp)</label>
+                    <input type="number" id="shippingCost" value="0" min="0" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
+                </div>
+                <div>
+                    <label for="otherOperationalCost" class="block text-gray-700 text-sm font-medium mb-2">Biaya Operasional Lainnya (Rp)</label>
+                    <input type="number" id="otherOperationalCost" value="0" min="0" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 transition duration-150 ease-in-out">
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-purple-50 p-6 rounded-lg shadow-sm mb-8">
+            <h2 class="text-xl font-semibold text-purple-700 mb-4">3. Margin Keuntungan yang Diinginkan</h2>
+            <div class="mb-4">
+                <label for="profitMargin" class="block text-gray-700 text-sm font-medium mb-2">Margin Keuntungan (%)</label>
+                <input type="number" id="profitMargin" value="30" min="0" max="100" class="w-full p-3 border border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500 transition duration-150 ease-in-out">
+            </div>
+        </div>
+
+        <div class="bg-yellow-50 p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold text-yellow-700 mb-4">4. Hasil Perhitungan</h2>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-medium mb-2">Total Biaya Pokok & Operasional (Rp)</label>
+                <p id="totalBaseCostDisplay" class="text-2xl font-bold text-gray-900 bg-gray-200 p-3 rounded-md"></p>
+            </div>
+            <div>
+                <label class="block text-gray-700 text-sm font-medium mb-2">Harga Jual Disarankan (Rp)</label>
+                <p id="sellingPriceDisplay" class="text-3xl font-extrabold text-blue-600 bg-blue-100 p-4 rounded-md"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get all input elements
+        const inputs = document.querySelectorAll('input[type="number"]');
+        const costOfGoodsInput = document.getElementById('costOfGoods');
+        const adCostInput = document.getElementById('adCost');
+        const platformFeeInput = document.getElementById('platformFee'); // Now a percentage
+        const packagingCostInput = document.getElementById('packagingCost');
+        const shippingCostInput = document.getElementById('shippingCost');
+        const otherOperationalCostInput = document.getElementById('otherOperationalCost');
+        const profitMarginInput = document.getElementById('profitMargin');
+
+        const totalBaseCostDisplay = document.getElementById('totalBaseCostDisplay'); // Renamed for clarity
+        const sellingPriceDisplay = document.getElementById('sellingPriceDisplay');
+
+        // Function to format number as Rupiah
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(number);
+        }
+
+        // Function to calculate selling price
+        function calculateSellingPrice() {
+            const costOfGoods = parseFloat(costOfGoodsInput.value) || 0;
+            const adCost = parseFloat(adCostInput.value) || 0;
+            const platformFeePercentage = parseFloat(platformFeeInput.value) || 0; // Get as percentage
+            const packagingCost = parseFloat(packagingCostInput.value) || 0;
+            const shippingCost = parseFloat(shippingCostInput.value) || 0;
+            const otherOperationalCost = parseFloat(otherOperationalCostInput.value) || 0;
+            const profitMargin = parseFloat(profitMarginInput.value) || 0;
+
+            // Calculate total base costs (excluding platform fee which is a percentage of selling price)
+            const totalBaseCost = costOfGoods + adCost + packagingCost + shippingCost + otherOperationalCost;
+
+            // Convert percentages to decimals
+            const profitMarginDecimal = profitMargin / 100;
+            const platformFeeDecimal = platformFeePercentage / 100;
+
+            // Calculate the denominator for the selling price formula
+            // sellingPrice = totalBaseCost / (1 - profitMarginDecimal - platformFeeDecimal)
+            const denominator = 1 - profitMarginDecimal - platformFeeDecimal;
+
+            let sellingPrice = 0;
+            if (denominator > 0) {
+                sellingPrice = totalBaseCost / denominator;
+            } else {
+                // If denominator is 0 or negative, it means the desired profit and platform fees
+                // are too high relative to the base cost, making a feasible selling price impossible.
+                sellingPrice = Infinity; // Or a specific error message
+            }
+
+            // Update display
+            totalBaseCostDisplay.textContent = formatRupiah(totalBaseCost);
+            if (sellingPrice === Infinity) {
+                sellingPriceDisplay.textContent = "Tidak Dapat Dihitung (Margin/Komisi Terlalu Tinggi)";
+                sellingPriceDisplay.classList.add('text-red-600');
+                sellingPriceDisplay.classList.remove('text-blue-600');
+            } else {
+                sellingPriceDisplay.textContent = formatRupiah(sellingPrice);
+                sellingPriceDisplay.classList.remove('text-red-600');
+                sellingPriceDisplay.classList.add('text-blue-600');
+            }
+        }
+
+        // Add event listeners to all input fields
+        inputs.forEach(input => {
+            input.addEventListener('input', calculateSellingPrice);
+        });
+
+        // Initial calculation on page load
+        window.onload = calculateSellingPrice;
+    </script>
+</body>
+</html>
